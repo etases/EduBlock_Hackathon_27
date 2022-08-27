@@ -42,8 +42,8 @@ import { GridColDef, GridRowsProp, DataGrid } from '@mui/x-data-grid'
 import { useNavigate } from 'react-router-dom'
 import { useStudentQuery } from '@fe/hooks/use-query'
 import { usePersistentState } from '@fe/hooks'
-import { useCanister } from '@connect2ic/react'
-import { backend } from '@be/backend'
+import { useCanister, useConnect } from '@connect2ic/react'
+// import { backend } from '@be/backend'
 import {
   StudentSubject,
   StudentGrade,
@@ -54,6 +54,8 @@ import { Principal } from '@dfinity/principal'
 import { useState } from 'react'
 import Select, { SelectChangeEvent } from '@mui/material/Select'
 import InputLabel from '@mui/material/InputLabel'
+import { dao } from '@be/dao'
+import { backend } from '@be/backend'
 
 const options = ['Chọn lớp học', '10', '11', '12']
 
@@ -146,9 +148,28 @@ export function SchoolReport() {
   console.log('sample slog')
 
   // backend.getStudentLog(Principal.fromText(account.principalId)).then(console.log)
-  backend
-    .getStudentLog(Principal.fromText(account.principalId))
-    .then(console.log)
+  // backend
+  //   .getStudentLog(Principal.fromText(account.principalId))
+  //   .then(console.log)
+
+  const { principal } = useConnect()
+
+  // const [dao, { error, loading }] = useCanister('dao')
+
+  useEffect(() => {
+    // dao.createRequest({
+    //   identity: principal,
+    //   reason: 'new',
+    //   student: {
+    //     grades:
+    //   }
+    // })
+    backend.getStudentLog(Principal.fromText(principal)).then((response) => {
+      console.log('log', response)
+      return response
+    })
+  }, [])
+
   const navigate = useNavigate()
 
   const handleClick = () => {
@@ -162,27 +183,30 @@ export function SchoolReport() {
   // secondHalfScore: 0/
   // teacherName: "tea"
   const columns: GridColDef[] = [
-    { field: 'id', headerName: 'Index' },
-    { field: 'name', headerName: 'Môn học' },
+    { field: 'id', headerName: 'Index', hide: true },
+    { field: 'name', headerName: 'Môn học', width: 400 },
     {
       field: 'firstHalfScore',
       headerName: 'Học kỳ 1',
-      type: 'number'
+      type: 'number',
+      width: 150
     },
     {
       field: 'secondHalfScore',
       headerName: 'Học kỳ 2',
-      type: 'number'
+      type: 'number',
+      width: 150
     },
     {
       field: 'finalScore',
       headerName: 'Cả năm',
-      type: 'number'
+      type: 'number',
+      width: 150
     }
   ]
 
   const columnsTemp: GridColDef[] = [
-    { field: 'id', headerName: 'Index' },
+    { field: 'id', headerName: 'Index', hideable: true },
     { field: 'name', headerName: 'Môn học' },
     {
       field: 'firstHalfScore',
@@ -285,9 +309,9 @@ export function SchoolReport() {
           {/* 2 BUTTONS */}
           <Stack
             direction="row"
-            justifyContent="space-around"
+            justifyContent="flex-start"
             alignItems="baseline"
-            spacing={0.5}
+            spacing={2}
           >
             <Button
               onClick={handleClick}
@@ -311,7 +335,7 @@ export function SchoolReport() {
                 height={'25px'}
               ></Box>
             </Button>
-            <Button
+            {/* <Button
               sx={{
                 background: '#f89c14',
                 color: 'white',
@@ -330,7 +354,7 @@ export function SchoolReport() {
                 src={edit}
                 height={'25px'}
               ></Box>
-            </Button>
+            </Button> */}
           </Stack>
 
           {/* 1 AVATAR and 3 INPUTs */}
@@ -366,13 +390,13 @@ export function SchoolReport() {
                   //error
                   id="outlined-error-helper-text"
                   label="Họ"
-                  defaultValue={account.firstName}
+                  value={account.firstName}
                 />
                 <TextField
                   //error
                   id="outlined-error-helper-text"
                   label="Tên"
-                  defaultValue={account.lastName}
+                  value={account.lastName}
                 />
                 <FormControl>
                   <FormLabel id="demo-radio-buttons-group-label">
@@ -380,7 +404,7 @@ export function SchoolReport() {
                   </FormLabel>
                   <RadioGroup
                     aria-labelledby="demo-radio-buttons-group-label"
-                    defaultValue={account.gender}
+                    value={account.gender}
                     name="radio-buttons-group"
                   >
                     <FormControlLabel
@@ -417,13 +441,13 @@ export function SchoolReport() {
                 //error
                 id="outlined-error-helper-text"
                 label="Số điện thoại"
-                defaultValue={account.phone}
+                value={account.phone}
               />
               <TextField
                 //error
                 id="outlined-error-helper-text"
                 label="Ngày Sinh"
-                defaultValue={account.dateOfBirth}
+                value={account.dateOfBirth}
               />
             </Stack>
             <Stack
@@ -436,13 +460,13 @@ export function SchoolReport() {
                 //error
                 id="outlined-error-helper-text"
                 label="Chỗ ở hiện tại"
-                defaultValue={account.address}
+                value={account.address}
               />
               <TextField
                 //error
                 id="outlined-error-helper-text"
                 label="Dân tộc"
-                defaultValue={account.ethnic.value}
+                value={account.ethnic.value}
               />
             </Stack>
           </Stack>
@@ -546,7 +570,7 @@ export function SchoolReport() {
                       }}
                     >
                       {studentLogs.map((log, index) => (
-                        <MenuItem value={index}>{index}</MenuItem>
+                        <MenuItem value={index}>{index + 1}</MenuItem>
                       ))}
                     </Select>
                   </FormControl>
@@ -587,7 +611,7 @@ export function SchoolReport() {
                       {studentLogs
                         .at(selectedStudentLogId)
                         .newStudent.grades.map((log, index) => (
-                          <MenuItem value={index}>{index}</MenuItem>
+                          <MenuItem value={index}>{index + 10}</MenuItem>
                         ))}
                     </Select>
                   </FormControl>
@@ -625,11 +649,13 @@ export function SchoolReport() {
               {/* TEMP TABLE component={DataGrid}*/}
               <div style={{ height: '100%', width: '50vw' }}>
                 <DataGrid
-                  rows={studentLogs.at(selectedStudentLogId).newStudent.grades.at(selectedGradeId)
+                  rows={studentLogs
+                    .at(selectedStudentLogId)
+                    .newStudent.grades.at(selectedGradeId)
                     .subjects.map((gr, index) => ({
-                    id: index,
-                    ...gr
-                  }))}
+                      id: index,
+                      ...gr
+                    }))}
                   columns={columns}
                   // pageSize={11}
                   // rowsPerPageOptions={[11]}
@@ -779,6 +805,7 @@ export function SchoolReport() {
                   width={'50%'}
                 >
                   <TextField
+                    onFocus={() => setFocus(index)}
                     value={s.finalScore}
                     onChange={({ target: { value } }) => {
                       setSelectedStudentGrades((prev) => {
