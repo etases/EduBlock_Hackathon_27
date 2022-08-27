@@ -192,10 +192,9 @@ actor EduBlock {
 
   private func _tranferStudentLogIfFound(owner : UserIdentity, newOwner : Principal) : () {
     switch (studentLogs.remove(owner)) {
-      case (null) return false;
+      case (null) return;
       case (?logs) {
         studentLogs.put(newOwner, logs);
-        return true;
       };
     };
   };
