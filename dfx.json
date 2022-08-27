@@ -8,12 +8,13 @@
             "main": "src/token/main.mo",
             "type": "motoko"
         },
-        "nft": {
-            "main": "src/nft/main.mo",
+        "dao": {
+            "dependencies": ["backend", "token"],
+            "main": "src/dao/main.mo",
             "type": "motoko"
         },
         "frontend": {
-            "dependencies": ["backend", "token", "nft"],
+            "dependencies": ["backend", "token", "dao"],
             "frontend": {
                 "entrypoint": "src/frontend/src/index.html"
             },
