@@ -11,6 +11,14 @@
             },
             "source": ["src/frontend/assets", "dist/frontend/"],
             "type": "assets"
+        },
+        "token": {
+            "main": "src/token/main.mo",
+            "type": "motoko"
+        },
+        "nft": {
+            "main": "src/nft/main.mo",
+            "type": "motoko"
         }
     },
     "defaults": {
