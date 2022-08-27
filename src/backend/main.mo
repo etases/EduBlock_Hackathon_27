@@ -190,6 +190,16 @@ actor EduBlock {
     };
   };
 
+  private func _tranferStudentLogIfFound(owner : UserIdentity, newOwner : Principal) : () {
+    switch (studentLogs.remove(owner)) {
+      case (null) return false;
+      case (?logs) {
+        studentLogs.put(newOwner, logs);
+        return true;
+      };
+    };
+  };
+
   private func _getStudentGrades(student : UserIdentity) : ?[StudentGrade] {
     switch (_getStudent(student)) {
       case (null) return null;
@@ -380,6 +390,7 @@ actor EduBlock {
     if (not _transferStudent(student, newOwner)) {
       return _toResponse(6);
     };
+    _tranferStudentLogIfFound(student, newOwner);
     return _toResponse(0);
   };
 };
