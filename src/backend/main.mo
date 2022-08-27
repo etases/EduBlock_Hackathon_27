@@ -23,7 +23,6 @@ shared({caller = owner}) actor class EduBlock() {
     secondHalfScore : Float;
     finalScore : Float;
     resitScore : Float;
-    teacherName : Text;
   };
 
   public type StudentGrade = {
