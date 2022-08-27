@@ -1,15 +1,12 @@
 import { NormalLayout } from '@fe/components'
 import {
   App,
-  Class,
-  ClassCreate,
-  ClassUpdate,
+  // Class,
+  // ClassCreate,
+  // ClassUpdate,
   Home,
-  Login,
-  SchoolReport,
-  Student,
-  Teacher,
-  TeacherPending
+  Marketplace,
+  Profile
 } from '@fe/pages'
 import { Navigate, RouteObject } from 'react-router-dom'
 
@@ -47,51 +44,61 @@ const ROUTES: NavigationObject[] = [
         element: <Home />,
         role: Anonymous
       },
-      {
-        path: 'login',
-        element: <Login />,
-        role: Anonymous
-      },
-      {
-        path: 'school-report',
-        element: <SchoolReport />,
-        role: Authenticated
-      },
+      // {
+      //   path: 'login',
+      //   element: <Login />,
+      //   role: Anonymous
+      // },
+      // {
+      //   path: 'school-report',
+      //   element: <SchoolReport />,
+      //   role: Authenticated
+      // },
       {
         path: 'app',
         element: <NormalLayout />,
         role: Authenticated,
         children: [
           {
-            path: 'teacher',
-            element: <Teacher />,
-            role: [ROLE.ADMIN]
+            index: true,
+            element: <Marketplace />,
+            role: Anonymous
           },
           {
-            path: 'teacher-pending',
-            element: <TeacherPending />,
-            role: [ROLE.ADMIN]
-          },
-          {
-            path: 'class',
-            element: <Class />,
-            role: [ROLE.ADMIN, ROLE.TEACHER]
-          },
-          {
-            path: 'class-create',
-            element: <ClassCreate />,
-            role: [ROLE.ADMIN]
-          },
-          {
-            path: 'class-update',
-            element: <ClassUpdate />,
-            role: [ROLE.ADMIN]
-          },
-          {
-            path: 'student',
-            element: <Student />,
-            role: Authenticated
+            path: 'profile',
+            element: <Profile />,
+            role: Anonymous
           }
+          // {
+          //   path: 'teacher',
+          //   element: <Teacher />,
+          //   role: [ROLE.ADMIN]
+          // },
+          // {
+          //   path: 'teacher-pending',
+          //   element: <TeacherPending />,
+          //   role: [ROLE.ADMIN]
+          // },
+          // {
+          //   path: 'class',
+          //   element: <Class />,
+          //   role: [ROLE.ADMIN, ROLE.TEACHER]
+          // },
+          // {
+          //   path: 'class-create',
+          //   element: <ClassCreate />,
+          //   role: [ROLE.ADMIN]
+          // },
+          // {
+          //   path: 'class-update',
+          //   element: <ClassUpdate />,
+          //   role: [ROLE.ADMIN]
+          // },
+          // {
+          //   path: 'student',
+          //   element: <Student />,
+          //   role: Authenticated
+          // }
         ]
       }
     ]

@@ -1,5 +1,5 @@
-import { TEXT } from '@fe/components/layout/text'
-import { Stack, Typography } from '@mui/material'
+import { Button, Link, Stack } from '@mui/material'
+import { Link as RouterLink } from 'react-router-dom'
 
 export function Header() {
   return (
@@ -7,13 +7,42 @@ export function Header() {
       width={'100%'}
       height={'100%'}
       alignItems={'center'}
-      justifyContent={'center'}
+      justifyContent={'space-between'}
+      direction={'row'}
+      // padding={1}
     >
+      {/* <Stack
+        direction={'row'}
+        justifyContent={'space-between'}
+        // alignSelf={'start'}
+      > */}
+      {/* logo */}
+      <Button size={'small'}>Logo</Button>
       <Stack
         direction={'row'}
-        // alignSelf={'start'}
+        spacing={1}
+        marginRight={1}
       >
-        <Typography
+        <Link
+          component={RouterLink}
+          to={'/home'}
+        >
+          Home
+        </Link>
+        <Link
+          component={RouterLink}
+          to={'/app'}
+        >
+          Market
+        </Link>
+        <Link
+          component={RouterLink}
+          to={'/app/profile'}
+        >
+          Profile
+        </Link>
+      </Stack>
+      {/* <Typography
           fontSize={64}
           color={'white'}
           fontWeight={600}
@@ -26,16 +55,16 @@ export function Header() {
           fontWeight={600}
         >
           {TEXT.BLOCK}
-        </Typography>
-      </Stack>
-      <Typography
+        </Typography> */}
+      {/* </Stack> */}
+      {/* <Typography
         // alignSelf={'end'}
         // marginRight={1}
         fontWeight={600}
         color={'white'}
       >
         Blockchain-based School Report
-      </Typography>
+      </Typography> */}
     </Stack>
   )
 }
