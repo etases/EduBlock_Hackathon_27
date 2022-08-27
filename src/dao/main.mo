@@ -51,6 +51,7 @@ actor DAO {
 
   private stable let minimumTokensToVote : Nat = 10000;
   private stable let minimumVoteToAccept : Nat = 5;
+  private stable let maximumRequestDurationSeconds : Nat =  60 * 60 * 24 * 7; // 1 week
 
   private stable var nextTokenId : Nat = 0;
   private stable var votes : [Vote] = [];
@@ -104,8 +105,12 @@ actor DAO {
     };
   };
 
+  private func _getRequest(requestId : Nat) : ?StudentUpdateRequest {
+    return requests.get(requestId);
+  };
+
   private func _getRequestIfAccepted(requestId : Nat) : ?StudentUpdateRequest {
-    switch (requests.get(requestId)) {
+    switch (_getRequest(requestId)) {
       case (null) null;
       case (?request) {
         let vote : Nat = Array.foldLeft(votes, 0, func (c : Nat, v : Vote) : Nat {
@@ -174,15 +179,22 @@ actor DAO {
     return { errorCode = 0; errorMessage = "Request Created" };
   };
 
+  /**
+   * The system's scheduler
+   */
   private var checkCount : Nat = 0;
   system func heartbeat() : async () {
     if (checkCount <= 10) {
       checkCount += 1;
       return;
     };
-    ignore checkRequests();
+    await checkRequests();
+    await clearOutdatedRequest();
   };
 
+  /**
+   * Check for requests that have accepted and execute them
+   */
   private func checkRequests() : async () {
     for (requestId in requests.keys()) {
       let optionRequest : ?StudentUpdateRequest = _getRequestIfAccepted(requestId);
@@ -190,6 +202,21 @@ actor DAO {
         _removeRequest(requestId);
         let request : StudentUpdateRequest = _optionalBreak(optionRequest);
         ignore Backend.updateStudent(request.identity, request.student, _optional(request.requester));
+      };
+    };
+  };
+
+  /**
+   * Remove requests that are outdated
+   */
+  private func clearOutdatedRequest() : async () {
+    for (requestId in requests.keys()) {
+      let optionRequest : ?StudentUpdateRequest = _getRequest(requestId);
+      if (Option.isSome(optionRequest)) {
+        let request : StudentUpdateRequest = _optionalBreak(optionRequest);
+        if ((Time.now() - request.timestamp) / 1000000000 > maximumRequestDurationSeconds) {
+          _removeRequest(requestId);
+        };
       };
     };
   };
