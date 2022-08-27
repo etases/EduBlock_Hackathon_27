@@ -128,7 +128,7 @@ actor EduBlock {
 
   private func _optionalBreak<T>(value : ?T) : T {
     switch (value) {
-      case (null) Prelude.xxx();
+      case (null) Prelude.unreachable();
       case (?v) v;
     };
   };

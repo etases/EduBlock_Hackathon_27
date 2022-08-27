@@ -3,6 +3,8 @@ import Time "mo:base/Time";
 import Array "mo:base/Array";
 import Int "mo:base/Int";
 import Iter "mo:base/Iter";
+import Prelude "mo:base/Prelude";
+import Option "mo:base/Option";
 
 import Backend "canister:backend";
 import Token "canister:token";
@@ -48,6 +50,7 @@ actor DAO {
   };
 
   private stable let minimumTokensToVote : Nat = 10000;
+  private stable let minimumVoteToAccept : Nat = 5;
 
   private stable var nextTokenId : Nat = 0;
   private stable var votes : [Vote] = [];
@@ -60,6 +63,14 @@ actor DAO {
 
   system func postupgrade() {
     requestEntries := [];
+  };
+
+  private func _optional<T>(value : T) : ?T {
+    Option.make(value);
+  };
+
+  private func _optionalBreak<T>(value : ?T) : T {
+    Option.unwrap(value);
   };
 
   private func _isVoted(voter : UserIdentity, requestId : Nat) : Bool {
@@ -80,6 +91,37 @@ actor DAO {
       voter = voter;
     };
     votes := Array.append(votes, [vote]);
+  };
+
+  private func _removeRequest(requestId : Nat) : () {
+    switch (requests.get(requestId)) {
+      case null return;
+      case _ {
+        votes := Array.filter(votes, func (v : Vote) : Bool {
+          return v.requestId != requestId;
+        });
+      };
+    };
+  };
+
+  private func _getRequestIfAccepted(requestId : Nat) : ?StudentUpdateRequest {
+    switch (requests.get(requestId)) {
+      case (null) null;
+      case (?request) {
+        let vote : Nat = Array.foldLeft(votes, 0, func (c : Nat, v : Vote) : Nat {
+          if (v.requestId == requestId and v.vote) {
+            return c + 1;
+          } else {
+            return c;
+          };
+        }); 
+        if (vote < minimumVoteToAccept) {
+          return null;
+        } else {
+          return _optional(request);
+        };
+      };
+    };
   };
 
   private func _addRequest(requester : UserIdentity, ticket : StudentUpdateTicket) : () {
@@ -130,5 +172,25 @@ actor DAO {
   public shared({caller}) func createRequest(ticket : StudentUpdateTicket) : async Response {
     _addRequest(caller, ticket);
     return { errorCode = 0; errorMessage = "Request Created" };
+  };
+
+  private var checkCount : Nat = 0;
+  system func heartbeat() : async () {
+    if (checkCount <= 10) {
+      checkCount += 1;
+      return;
+    };
+    ignore checkRequests();
+  };
+
+  private func checkRequests() : async () {
+    for (requestId in requests.keys()) {
+      let optionRequest : ?StudentUpdateRequest = _getRequestIfAccepted(requestId);
+      if (Option.isSome(optionRequest)) {
+        _removeRequest(requestId);
+        let request : StudentUpdateRequest = _optionalBreak(optionRequest);
+        ignore Backend.updateStudent(request.identity, request.student, _optional(request.requester));
+      };
+    };
   };
 };
