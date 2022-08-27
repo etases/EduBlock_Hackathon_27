@@ -50,7 +50,7 @@ actor DAO {
   };
 
   private stable let minimumTokensToVote : Nat = 10000;
-  private stable let minimumVoteToAccept : Nat = 5;
+  private stable let minimumVoteToAccept : Nat = 2;
   private stable let maximumRequestDurationSeconds : Nat =  60 * 60 * 24 * 7; // 1 week
 
   private stable var nextTokenId : Nat = 0;
@@ -141,10 +141,24 @@ actor DAO {
   };
 
   /**
+   * Check if the user can vote on the request.
+   */
+  public func canVote(identity : UserIdentity) : async Bool {
+    (await Token.balanceOf(identity)) >= minimumTokensToVote;
+  };
+
+  /**
+   * Check if the caller can accept the request.
+   */
+  public shared({caller}) func canIVote() : async Bool {
+    await canVote(caller);
+  };
+
+  /**
    * Vote Function
    */
   public shared({caller}) func vote(args: VoteArgs) : async Response {
-    if ((await Token.balanceOf(caller)) < minimumTokensToVote) {
+    if (not (await canVote(caller))) {
       return { errorCode = 1; errorMessage = "You don't have enough credit to vote"; };
     };
 
@@ -214,7 +228,7 @@ actor DAO {
       let optionRequest : ?StudentUpdateRequest = _getRequest(requestId);
       if (Option.isSome(optionRequest)) {
         let request : StudentUpdateRequest = _optionalBreak(optionRequest);
-        if ((Time.now() - request.timestamp) / 1000000000 > maximumRequestDurationSeconds) {
+        if (((Time.now() - request.timestamp) / 1000000000) > maximumRequestDurationSeconds) {
           _removeRequest(requestId);
         };
       };
