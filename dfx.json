@@ -4,14 +4,6 @@
             "main": "src/backend/main.mo",
             "type": "motoko"
         },
-        "frontend": {
-            "dependencies": ["backend"],
-            "frontend": {
-                "entrypoint": "src/frontend/src/index.html"
-            },
-            "source": ["src/frontend/assets", "dist/frontend/"],
-            "type": "assets"
-        },
         "token": {
             "main": "src/token/main.mo",
             "type": "motoko"
@@ -19,6 +11,14 @@
         "nft": {
             "main": "src/nft/main.mo",
             "type": "motoko"
+        },
+        "frontend": {
+            "dependencies": ["backend", "token", "nft"],
+            "frontend": {
+                "entrypoint": "src/frontend/src/index.html"
+            },
+            "source": ["src/frontend/assets", "dist/frontend/"],
+            "type": "assets"
         }
     },
     "defaults": {

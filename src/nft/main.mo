@@ -27,11 +27,9 @@ actor Dip721Nft {
 	
 	private stable var tokenURIEntries : [(TokenId, Text)] = [];
 	private stable var ownersEntries : [(TokenId, Principal)] = [];
-	private stable var balancesEntries : [(Principal, Nat)] = [];
 	
 	private let tokenURIs : HashMap.HashMap<TokenId, Text> = HashMap.fromIter<TokenId, Text>(tokenURIEntries.vals(), 10, Nat.equal, Hash.hash);
 	private let owners : HashMap.HashMap<TokenId, Principal> = HashMap.fromIter<TokenId, Principal>(ownersEntries.vals(), 10, Nat.equal, Hash.hash);
-	private let balances : HashMap.HashMap<Principal, Nat> = HashMap.fromIter<Principal, Nat>(balancesEntries.vals(), 10, Principal.equal, Principal.hash);
 	
 	private func _unwrap<T>(x : ?T) : T {
 		switch x {
@@ -42,10 +40,6 @@ actor Dip721Nft {
 
 	public shared query func allTokens() : async [TokenId] {
 		return Iter.toArray(tokenURIs.keys());
-	};
-	
-	public shared query func balanceOf(p : Principal) : async ?Nat {
-		return balances.get(p);
 	};
 	
 	public shared query func ownerOf(tokenId : TokenId) : async ?Principal {
@@ -96,37 +90,12 @@ actor Dip721Nft {
 		assert _exists(tokenId);
 		assert _unwrap(_ownerOf(tokenId)) == from;
 		
-		_decrementBalance(from);
-		_incrementBalance(to);
 		owners.put(tokenId, to);
-	};
-	
-	private func _incrementBalance(address : Principal) {
-		switch (balances.get(address)) {
-			case (?v) {
-				balances.put(address, v + 1);
-			};
-			case null {
-				balances.put(address, 1);
-			}
-		}
-	};
-	
-	private func _decrementBalance(address : Principal) {
-		switch (balances.get(address)) {
-			case (?v) {
-				balances.put(address, v - 1);
-			};
-			case null {
-				balances.put(address, 0);
-			}
-		}
 	};
 	
 	private func _mint(to : Principal, tokenId : Nat, uri : Text) : () {
 		assert not _exists(tokenId);
 		
-		_incrementBalance(to);
 		owners.put(tokenId, to);
 		tokenURIs.put(tokenId,uri)
 	};
@@ -134,21 +103,16 @@ actor Dip721Nft {
 	private func _burn(tokenId : Nat) {
 		let owner = _unwrap(_ownerOf(tokenId));
 		
-		_decrementBalance(owner);
-		
 		ignore owners.remove(tokenId);
 	};
 	
 	system func preupgrade() {
 		tokenURIEntries := Iter.toArray(tokenURIs.entries());
 		ownersEntries := Iter.toArray(owners.entries());
-		balancesEntries := Iter.toArray(balances.entries());
-	
 	};
 	
 	system func postupgrade() {
 		tokenURIEntries := [];
 		ownersEntries := [];
-		balancesEntries := [];
 	};
 }
