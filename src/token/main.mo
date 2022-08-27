@@ -16,17 +16,17 @@ shared({caller = owner}) actor class Dip20Token() {
 		_balanceOf(caller) >= minimum;
 	};
 	
-	stable var logo_ : Text = "https://via.placeholder.com/500";
+	stable var logo_ : Text = "https://github.com/etases/EduBlock_Hackathon_27/raw/main/TokenLogo.png";
 	
 	stable var decimals_ : Nat8 = 2;
 	
-	stable var name_ : Text = "ExampleCoin";
+	stable var name_ : Text = "etasesToken";
 	
 	stable var totalSupply_ : Nat = 10000000000;
 	
-	stable var symbol_ : Text = "EXC";
+	stable var symbol_ : Text = "ETAX";
 	
-	stable var fee_ : Nat = 1000;
+	stable var fee_ : Nat = 100;
 	
 	stable var owner_ : Principal = owner;
 	

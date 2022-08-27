@@ -14,9 +14,9 @@ actor Dip721Nft {
 		_ownerOf(tokenId) == ?caller;
 	};
 	
-	stable var name_ : Text = "ExampleNFT";
+	stable var name_ : Text = "etasesNFT";
 	
-	stable var symbol_ : Text = "ENFT";
+	stable var symbol_ : Text = "ETAXN";
 	
 	// Adapted from: https://github.com/SuddenlyHazel/DIP721/blob/main/src/DIP721/DIP721.mo
 	
