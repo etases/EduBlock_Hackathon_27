@@ -1,13 +1,4 @@
-import { NormalLayout } from '@fe/components'
-import {
-  App,
-  // Class,
-  // ClassCreate,
-  // ClassUpdate,
-  Home,
-  Marketplace,
-  Profile
-} from '@fe/pages'
+import { App, Home, Login, SchoolReport, TransferToken, Vote } from '@fe/pages'
 import { Navigate, RouteObject } from 'react-router-dom'
 
 const ROLE = {
@@ -44,63 +35,73 @@ const ROUTES: NavigationObject[] = [
         element: <Home />,
         role: Anonymous
       },
-      // {
-      //   path: 'login',
-      //   element: <Login />,
-      //   role: Anonymous
-      // },
-      // {
-      //   path: 'school-report',
-      //   element: <SchoolReport />,
-      //   role: Authenticated
-      // },
       {
-        path: 'app',
-        element: <NormalLayout />,
-        role: Authenticated,
-        children: [
-          {
-            index: true,
-            element: <Marketplace />,
-            role: Anonymous
-          },
-          {
-            path: 'profile',
-            element: <Profile />,
-            role: Anonymous
-          }
-          // {
-          //   path: 'teacher',
-          //   element: <Teacher />,
-          //   role: [ROLE.ADMIN]
-          // },
-          // {
-          //   path: 'teacher-pending',
-          //   element: <TeacherPending />,
-          //   role: [ROLE.ADMIN]
-          // },
-          // {
-          //   path: 'class',
-          //   element: <Class />,
-          //   role: [ROLE.ADMIN, ROLE.TEACHER]
-          // },
-          // {
-          //   path: 'class-create',
-          //   element: <ClassCreate />,
-          //   role: [ROLE.ADMIN]
-          // },
-          // {
-          //   path: 'class-update',
-          //   element: <ClassUpdate />,
-          //   role: [ROLE.ADMIN]
-          // },
-          // {
-          //   path: 'student',
-          //   element: <Student />,
-          //   role: Authenticated
-          // }
-        ]
+        path: 'login',
+        element: <Login />,
+        role: Anonymous
+      },
+      {
+        path: 'school-report',
+        element: <SchoolReport />,
+        role: Authenticated
+      },
+      {
+        path: 'vote',
+        element: <Vote />,
+        role: Authenticated
+      },
+      {
+        path: 'transfer-token',
+        element: <TransferToken />,
+        role: [ROLE.ADMIN]
       }
+      // {
+      //   path: 'app',
+      //   element: <NormalLayout />,
+      //   role: Authenticated,
+      //   children: [
+      //     {
+      //       index: true,
+      //       element: <Marketplace />,
+      //       role: Anonymous
+      //     },
+      //     {
+      //       path: 'profile',
+      //       element: <Profile />,
+      //       role: Anonymous
+      //     }
+      //     {
+      //       path: 'teacher',
+      //       element: <Teacher />,
+      //       role: [ROLE.ADMIN]
+      //     },
+      //     {
+      //       path: 'teacher-pending',
+      //       element: <TeacherPending />,
+      //       role: [ROLE.ADMIN]
+      //     },
+      //     {
+      //       path: 'class',
+      //       element: <Class />,
+      //       role: [ROLE.ADMIN, ROLE.TEACHER]
+      //     },
+      //     {
+      //       path: 'class-create',
+      //       element: <ClassCreate />,
+      //       role: [ROLE.ADMIN]
+      //     },
+      //     {
+      //       path: 'class-update',
+      //       element: <ClassUpdate />,
+      //       role: [ROLE.ADMIN]
+      //     },
+      //     {
+      //       path: 'student',
+      //       element: <Student />,
+      //       role: Authenticated
+      //     }
+      //   ]
+      // }
     ]
   },
   {
