@@ -196,11 +196,11 @@ function ClassTeacherForm(props) {
   }, [searchDebounced, page, pageSize])
 
   useEffect(() => {
-    console.log({ teachers })
+    // console.log({ teachers })
   }, [teachers])
 
   useEffect(() => {
-    console.log({ selectedTeacher })
+    // console.log({ selectedTeacher })
   }, [selectedTeacher])
 
   return (
@@ -364,11 +364,11 @@ function ClassStudentsForm(props) {
   }, [searchDebounced, page, pageSize])
 
   useEffect(() => {
-    console.log({ students })
+    // console.log({ students })
   }, [students])
 
   useEffect(() => {
-    console.log({ selectedStudentList })
+    // console.log({ selectedStudentList })
   }, [selectedStudentList])
 
   return (

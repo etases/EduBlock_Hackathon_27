@@ -66,12 +66,12 @@ export function useAdminLogin(props?: UseAdminLoginProps) {
   })
 
   useEffect(() => {
-    console.log('adminLoginRole', role)
+    // console.log('adminLoginRole', role)
     if (role !== 1) setSearch('')
   }, [role])
 
   useEffect(() => {}, [search])
-  console.log('admin search', search)
+  // console.log('admin search', search)
 
   useEffect(() => {
     if (
@@ -86,7 +86,7 @@ export function useAdminLogin(props?: UseAdminLoginProps) {
   useEffect(() => {
     setSearch('')
     if (account.accountId.length > 0 && isConnected && account.role.id === 1)
-      navigate('/app')
+      navigate('/transfer-token')
   }, [account])
 
   function login() {
