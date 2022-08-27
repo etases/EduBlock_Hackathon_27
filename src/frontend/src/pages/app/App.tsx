@@ -1,6 +1,4 @@
 import { usePersistentState } from '@fe/hooks'
-import { defaultAccountValue } from '@fe/storages/atoms/persistentAtoms'
-import { useEffect } from 'react'
 import { Outlet, useNavigate } from 'react-router-dom'
 
 export function App() {
@@ -9,13 +7,13 @@ export function App() {
     store: 'account'
   })
 
-  useEffect(() => {
-    setAccount(defaultAccountValue)
-  }, [])
+  // useEffect(() => {
+  //   setAccount(defaultAccountValue)
+  // }, [])
 
-  useEffect(() => {
-    if (account.accountId.length === 0) navigate('/login')
-  }, [account])
+  // useEffect(() => {
+  //   if (account.accountId.length === 0) navigate('/login')
+  // }, [account])
 
   return <Outlet />
 }
