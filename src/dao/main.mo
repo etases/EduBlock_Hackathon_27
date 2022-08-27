@@ -38,6 +38,11 @@ actor DAO {
     request : StudentUpdateRequest;
   };
 
+  public type StudentUpdateTicket = {
+    identity : UserIdentity;
+    student : Student;
+  };
+
   public type Vote = {
     requestId: Nat;
     vote: Bool;
@@ -55,6 +60,7 @@ actor DAO {
     errorMessage: Text;
   };
 
+  private stable var nextTokenId : Nat = 0;
   private stable var votes : [Vote] = [];
   private stable var requestEntries : [(Nat, StudentUpdateRequest)] = [];
   private let requests : HashMap<Nat, StudentUpdateRequest> = HashMap.fromIter(requestEntries.vals(), 10, Int.equal, Int.hash);
@@ -87,6 +93,17 @@ actor DAO {
     votes := Array.append(votes, [vote]);
   };
 
+  private func _addRequest(requester : UserIdentity, ticket : StudentUpdateTicket) : () {
+    nextTokenId += 1;
+    let request : StudentUpdateRequest = {
+      identity = requester;
+      student = ticket.student;
+      requester = requester;
+      timestamp = Time.now();
+    };
+    requests.put(nextTokenId, request);
+  };
+
   /**
    * Vote Function
    */
@@ -112,5 +129,13 @@ actor DAO {
         request = t.1;
       };
     });
+  };
+
+  /**
+   * Create Request Function
+   */
+  public shared({caller}) func createRequest(ticket : StudentUpdateTicket) : async Response {
+    _addRequest(caller, ticket);
+    return { errorCode = 0; errorMessage = "Request Created" };
   };
 };
