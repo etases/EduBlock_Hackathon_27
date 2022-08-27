@@ -87,7 +87,9 @@ actor DAO {
     votes := Array.append(votes, [vote]);
   };
 
-  //Create vote function
+  /**
+   * Vote Function
+   */
   public shared({caller}) func vote(args: VoteArgs) : async Response {
     if (_isVoted(caller, args.requestId)) {
       return { errorCode = 1; errorMessage = "You have already voted"; };
@@ -95,5 +97,20 @@ actor DAO {
 
     _addVote(caller, args);
     return { errorCode = 0; errorMessage = "Vote Success" };
+  };
+
+  /**
+   * Get Request Function
+   */
+  public shared({caller}) func getIncomingRequests() : async [StudentUpdateRequestResponse] {
+    let tuples : [(Nat, StudentUpdateRequest)] = Array.filter(Iter.toArray(requests.entries()), func (t : (Nat, StudentUpdateRequest)) : Bool {
+      return not _isVoted(caller, t.0);
+    });
+    return Array.map(tuples, func (t : (Nat, StudentUpdateRequest)) : StudentUpdateRequestResponse {
+      return {
+        id = t.0;
+        request = t.1;
+      };
+    });
   };
 };
