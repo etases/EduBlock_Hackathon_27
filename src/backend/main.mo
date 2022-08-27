@@ -328,6 +328,20 @@ actor EduBlock {
   };
 
   /**
+   * Update the student records
+   */
+  public shared({caller}) func updateStudent(studentIdentity : UserIdentity, newStudent : Student) : async Response {
+    if (not _isOwner(caller)) {
+      return _toResponse(2);
+    };
+    let _ : Bool = _addStudent(studentIdentity); // Add student if does not exist
+    let student : Student = _optionalBreak(_getStudent(studentIdentity));
+    _replaceStudent(studentIdentity, newStudent);
+    _addStudentToLog(studentIdentity, student, newStudent, caller);
+    return _toResponse(0);
+  };
+
+  /**
    * Update the student's subjects by grade name
    */
   public shared({caller}) func updateStudentSubjects(studentIdentity : UserIdentity, gradeName : Text, subjects : [StudentSubject]) : async Response {
