@@ -66,12 +66,12 @@ export function useTeacherLogin(props?: UseTeacherLoginProps) {
   })
 
   useEffect(() => {
-    console.log('teacherLoginRole', role)
+    // console.log('teacherLoginRole', role)
     if (role !== 2) setSearch('')
   }, [role])
 
   useEffect(() => {}, [search])
-  console.log('teacher search', search)
+  // console.log('teacher search', search)
 
   useEffect(() => {
     if (
@@ -86,7 +86,7 @@ export function useTeacherLogin(props?: UseTeacherLoginProps) {
   useEffect(() => {
     setSearch('')
     if (account.accountId.length > 0 && isConnected && account.role.id === 2)
-      navigate('/app')
+      navigate('/vote')
   }, [account])
 
   function login() {
