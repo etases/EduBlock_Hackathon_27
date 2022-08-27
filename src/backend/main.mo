@@ -36,9 +36,9 @@ shared({caller = owner}) actor class EduBlock() {
   };
 
   private type StudentLog = {
-    oldStudent : ?Student;
+    oldStudent : Student;
     newStudent : Student;
-    teacher : UserIdentity;
+    requester : UserIdentity;
     timestamp : Time;
   };
 
@@ -152,13 +152,13 @@ shared({caller = owner}) actor class EduBlock() {
     };
   };
 
-  private func _addStudentToLog(identity : UserIdentity, oldStudent : ?Student, newStudent : Student, teacher : UserIdentity) : () {
+  private func _addStudentToLog(identity : UserIdentity, oldStudent : Student, newStudent : Student, requester : UserIdentity) : () {
     let oldLogs : [StudentLog] = _getStudentLog(identity);
     let newLogs : [StudentLog] = Array.append(oldLogs, [{
       oldStudent = oldStudent;
       newStudent = newStudent;
       timestamp = Time.now();
-      teacher = teacher;
+      requester = requester;
     }]);
     studentLogs.put(identity, newLogs);
   };
@@ -327,7 +327,7 @@ shared({caller = owner}) actor class EduBlock() {
     let studentGrade : StudentGrade = _optionalBreak(_getStudentGrade(checkedStudent, gradeName));
     let newStudent : Student = _updateStudentSubjects(checkedStudent, gradeName, subjects);
     _replaceStudent(studentIdentity, newStudent);
-    _addStudentToLog(studentIdentity, _optional(checkedStudent), newStudent, caller);
+    _addStudentToLog(studentIdentity, checkedStudent, newStudent, caller);
     return _toResponse(0);
   };
 
