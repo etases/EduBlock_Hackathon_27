@@ -11,7 +11,7 @@ import List "mo:base/List";
 import Time "mo:base/Time";
 import Prelude "mo:base/Prelude";
 
-shared({caller = owner}) actor class EduBlock() {
+actor EduBlock {
   public type Time = Time.Time;
   public type UserIdentity = Principal;
   public type Set<X> = TrieSet.Set<X>;
@@ -22,8 +22,6 @@ shared({caller = owner}) actor class EduBlock() {
     firstHalfScore : Float;
     secondHalfScore : Float;
     finalScore : Float;
-    resitScore : Float;
-    teacherName : Text;
   };
 
   public type StudentGrade = {
@@ -52,6 +50,11 @@ shared({caller = owner}) actor class EduBlock() {
     errorMessage: Text;
     data: ?T;
   };
+
+  /**
+   * The owner of the block
+   */
+  private let owner : Principal = Principal.fromText("3zqme-qbotn-kkkwg-ielsb-aibbm-32ozt-vwbzo-znmuf-dutty-5idsr-rqe");
 
   /**
    * The map of possible responses
@@ -125,7 +128,7 @@ shared({caller = owner}) actor class EduBlock() {
 
   private func _optionalBreak<T>(value : ?T) : T {
     switch (value) {
-      case (null) Prelude.xxx();
+      case (null) Prelude.unreachable();
       case (?v) v;
     };
   };
@@ -183,6 +186,15 @@ shared({caller = owner}) actor class EduBlock() {
       case (?student) {
         _replaceStudent(newOwner, student);
         return true;
+      };
+    };
+  };
+
+  private func _tranferStudentLogIfFound(owner : UserIdentity, newOwner : Principal) : () {
+    switch (studentLogs.remove(owner)) {
+      case (null) return;
+      case (?logs) {
+        studentLogs.put(newOwner, logs);
       };
     };
   };
@@ -325,6 +337,25 @@ shared({caller = owner}) actor class EduBlock() {
   };
 
   /**
+   * Update the student records
+   */
+  public shared({caller}) func updateStudent(studentIdentity : UserIdentity, newStudent : Student, requester : ?Principal) : async Response {
+    if (not _isOwner(caller)) {
+      return _toResponse(2);
+    };
+    let _ : Bool = _addStudent(studentIdentity); // Add student if does not exist
+    let student : Student = _optionalBreak(_getStudent(studentIdentity));
+    _replaceStudent(studentIdentity, newStudent);
+
+    let actualRequester : Principal = switch (requester) {
+      case (null) caller;
+      case (?r) r;
+    };
+    _addStudentToLog(studentIdentity, student, newStudent, actualRequester);
+    return _toResponse(0);
+  };
+
+  /**
    * Update the student's subjects by grade name
    */
   public shared({caller}) func updateStudentSubjects(studentIdentity : UserIdentity, gradeName : Text, subjects : [StudentSubject]) : async Response {
@@ -358,6 +389,7 @@ shared({caller = owner}) actor class EduBlock() {
     if (not _transferStudent(student, newOwner)) {
       return _toResponse(6);
     };
+    _tranferStudentLogIfFound(student, newOwner);
     return _toResponse(0);
   };
 };

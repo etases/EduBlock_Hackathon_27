@@ -10,7 +10,7 @@ import Result "mo:base/Result";
 import ExperimentalCycles "mo:base/ExperimentalCycles";
 import P "mo:base/Prelude";
 
-shared({caller = owner}) actor class Dip20Token() {
+actor Dip20Token {
 	public shared query (doIHaveTokens__msg) func doIHaveTokens(minimum : Nat) : async Bool {
 		let caller = doIHaveTokens__msg.caller; // First input
 		_balanceOf(caller) >= minimum;
@@ -28,7 +28,7 @@ shared({caller = owner}) actor class Dip20Token() {
 	
 	stable var fee_ : Nat = 100;
 	
-	stable var owner_ : Principal = owner;
+	stable var owner_ : Principal = Principal.fromText("3zqme-qbotn-kkkwg-ielsb-aibbm-32ozt-vwbzo-znmuf-dutty-5idsr-rqe");
 	
 	// Adapted from: https://github.com/Psychedelic/DIP20/blob/main/motoko/src/token.mo
 	
