@@ -24,6 +24,9 @@ actor EduBlock {
   private type StudentRecord = {
     subjects : [StudentSubject];
     image : Text;
+    fullName : Text;
+    school : Text;
+    grade : Nat;
   };
 
   private let maxIdPool : Nat8 = 64;
