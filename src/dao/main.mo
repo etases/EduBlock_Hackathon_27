@@ -20,6 +20,7 @@ actor DAO {
     student : Student;
     requester : UserIdentity;
     timestamp : Time;
+    reason : Text;
   };
 
   public type StudentUpdateRequestResponse = {
@@ -30,6 +31,7 @@ actor DAO {
   public type StudentUpdateTicket = {
     identity : UserIdentity;
     student : Student;
+    reason : Text;
   };
 
   public type Vote = {
@@ -136,6 +138,7 @@ actor DAO {
       student = ticket.student;
       requester = requester;
       timestamp = Time.now();
+      reason = ticket.reason;
     };
     requests.put(nextTokenId, request);
   };
