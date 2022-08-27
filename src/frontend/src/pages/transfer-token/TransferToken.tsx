@@ -1,6 +1,8 @@
+import { useCanister } from '@connect2ic/react'
 import { TextField, Button, Typography, Stack } from "@mui/material";
 
 export function TransferToken() {
+  const [token, { error, loading }] = useCanister('token')
   return (
     <Stack
       direction="column"
