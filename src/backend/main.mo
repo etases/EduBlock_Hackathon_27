@@ -177,6 +177,16 @@ shared({caller = owner}) actor class EduBlock() {
     return false;
   };
 
+  private func _transferStudent(owner : UserIdentity, newOwner : Principal) : Bool {
+    switch (students.remove(owner)) {
+      case (null) return false;
+      case (?student) {
+        _replaceStudent(newOwner, student);
+        return true;
+      };
+    };
+  };
+
   private func _getStudentGrades(student : UserIdentity) : ?[StudentGrade] {
     switch (_getStudent(student)) {
       case (null) return null;
@@ -336,5 +346,18 @@ shared({caller = owner}) actor class EduBlock() {
    */
   public shared({caller}) func getStudentLog(student : UserIdentity) : async ResponseWithData<[StudentLog]> {
     return _toResponseWithData(0, _optional(_getStudentLog(student)));
+  };
+
+  /**
+   * Transfer student info to a new identity
+   */
+  public shared({caller}) func transferStudent(student : UserIdentity, newOwner : UserIdentity) : async Response {
+    if (not _isOwner(caller)) {
+      return _toResponse(1);
+    };
+    if (not _transferStudent(student, newOwner)) {
+      return _toResponse(6);
+    };
+    return _toResponse(0);
   };
 };
