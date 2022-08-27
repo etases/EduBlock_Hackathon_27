@@ -4,27 +4,14 @@ import Array "mo:base/Array";
 import Int "mo:base/Int";
 import Iter "mo:base/Iter";
 
+import Backend "canister:backend";
+import Token "canister:token";
+
 actor DAO {
   public type Time = Time.Time;
   public type UserIdentity = Principal;
   public type HashMap<K, V> = HashMap.HashMap<K, V>;
-
-  public type StudentSubject = {
-    name : Text;
-    firstHalfScore : Float;
-    secondHalfScore : Float;
-    finalScore : Float;
-    resitScore : Float;
-  };
-
-  public type StudentGrade = {
-    name : Text;
-    subjects : [StudentSubject];
-  };
-
-  public type Student = {
-    grades : [StudentGrade];
-  };
+  public type Student = Backend.Student;
 
   public type StudentUpdateRequest = {
     identity : UserIdentity;
@@ -59,6 +46,8 @@ actor DAO {
     errorCode: Int;
     errorMessage: Text;
   };
+
+  private stable let minimumTokensToVote : Nat = 10000;
 
   private stable var nextTokenId : Nat = 0;
   private stable var votes : [Vote] = [];
@@ -108,8 +97,12 @@ actor DAO {
    * Vote Function
    */
   public shared({caller}) func vote(args: VoteArgs) : async Response {
+    if ((await Token.balanceOf(caller)) < minimumTokensToVote) {
+      return { errorCode = 1; errorMessage = "You don't have enough credit to vote"; };
+    };
+
     if (_isVoted(caller, args.requestId)) {
-      return { errorCode = 1; errorMessage = "You have already voted"; };
+      return { errorCode = 2; errorMessage = "You have already voted"; };
     };
 
     _addVote(caller, args);

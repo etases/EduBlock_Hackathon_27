@@ -11,7 +11,7 @@ import List "mo:base/List";
 import Time "mo:base/Time";
 import Prelude "mo:base/Prelude";
 
-shared({caller = owner}) actor class EduBlock() {
+actor EduBlock {
   public type Time = Time.Time;
   public type UserIdentity = Principal;
   public type Set<X> = TrieSet.Set<X>;
@@ -22,7 +22,6 @@ shared({caller = owner}) actor class EduBlock() {
     firstHalfScore : Float;
     secondHalfScore : Float;
     finalScore : Float;
-    resitScore : Float;
   };
 
   public type StudentGrade = {
@@ -51,6 +50,11 @@ shared({caller = owner}) actor class EduBlock() {
     errorMessage: Text;
     data: ?T;
   };
+
+  /**
+   * The owner of the block
+   */
+  private let owner : Principal = Principal.fromText("3zqme-qbotn-kkkwg-ielsb-aibbm-32ozt-vwbzo-znmuf-dutty-5idsr-rqe");
 
   /**
    * The map of possible responses
