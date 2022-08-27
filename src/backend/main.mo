@@ -12,12 +12,12 @@ import Time "mo:base/Time";
 import Prelude "mo:base/Prelude";
 
 shared({caller = owner}) actor class EduBlock() {
-  private type Time = Time.Time;
-  private type UserIdentity = Principal;
-  private type Set<X> = TrieSet.Set<X>;
-  private type HashMap<K, V> = HashMap.HashMap<K, V>;
+  public type Time = Time.Time;
+  public type UserIdentity = Principal;
+  public type Set<X> = TrieSet.Set<X>;
+  public type HashMap<K, V> = HashMap.HashMap<K, V>;
 
-  private type StudentSubject = {
+  public type StudentSubject = {
     name : Text;
     firstHalfScore : Float;
     secondHalfScore : Float;
@@ -26,28 +26,28 @@ shared({caller = owner}) actor class EduBlock() {
     teacherName : Text;
   };
 
-  private type StudentGrade = {
+  public type StudentGrade = {
     name : Text;
     subjects : [StudentSubject];
   };
 
-  private type Student = {
+  public type Student = {
     grades : [StudentGrade];
   };
 
-  private type StudentLog = {
+  public type StudentLog = {
     oldStudent : Student;
     newStudent : Student;
     requester : UserIdentity;
     timestamp : Time;
   };
 
-  private type Response = {
+  public type Response = {
     errorCode: Int;
     errorMessage: Text;
   };
 
-  private type ResponseWithData<T> = {
+  public type ResponseWithData<T> = {
     errorCode: Int;
     errorMessage: Text;
     data: ?T;
