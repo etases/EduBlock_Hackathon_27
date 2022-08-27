@@ -39,6 +39,10 @@ actor Dip721Nft {
 			case (?x_) { x_ };
 		}
 	};
+
+	public shared query func allTokens() : async [TokenId] {
+		return Iter.toArray(tokenURIs.keys());
+	};
 	
 	public shared query func balanceOf(p : Principal) : async ?Nat {
 		return balances.get(p);
