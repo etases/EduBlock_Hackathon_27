@@ -222,7 +222,8 @@ actor DAO {
         _removeRequest(requestId);
         let request : StudentUpdateRequest = _optionalBreak(optionRequest);
         Debug.print("Executing request " # Nat.toText(requestId) # " for " # Principal.toText(request.identity));
-        ignore Backend.updateStudent(request.identity, request.student, _optional(request.requester));
+        let response : Response = await Backend.updateStudent(request.identity, request.student, _optional(request.requester));
+        Debug.print("Response: " # Int.toText(response.errorCode) # " " # response.errorMessage);
       };
     };
   };
