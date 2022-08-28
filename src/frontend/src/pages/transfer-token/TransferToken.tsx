@@ -51,7 +51,7 @@ export function TransferToken() {
       <Button
         onClick={() => {
           token
-            .transfer(Principal.fromText(principal), BigInt(noOfToken))
+            .transfer(Principal.fromText(principalId), BigInt(noOfToken))
             .then(console.log)
         }}
       >
@@ -59,7 +59,7 @@ export function TransferToken() {
       </Button>
       <Button
         onClick={() => {
-          token.balanceOf(Principal.fromText(principal)).then(console.log)
+          token.balanceOf(Principal.fromText(principalId)).then(console.log)
         }}
       >
         <Typography>balance</Typography>

@@ -1,7 +1,7 @@
 //import { backend } from '@be/backend'
-import * as React from 'react'
-import { Box, Button, Typography, Stack } from '@mui/material'
 import { Img } from '@fe/components'
+import { Box, Button, Stack, Typography } from '@mui/material'
+import { useNavigate } from 'react-router-dom'
 // @ts-ignore
 import img_block_small from './images/Block_01.png'
 // @ts-ignore
@@ -12,7 +12,6 @@ import fues from './images/fues.png'
 import img_block_big from './images/BigBlock.png'
 // @ts-ignore
 import rec from './images/rectangle.png'
-import { useNavigate } from 'react-router-dom'
 
 export function Home() {
   const navigate = useNavigate()
@@ -50,7 +49,7 @@ export function Home() {
               src={img_block_small}
               height={'30%'}
             ></Box>
-            &nbsp;{' ESTATE'}
+            &nbsp;{' ETASES'}
           </Typography>
 
           <Box

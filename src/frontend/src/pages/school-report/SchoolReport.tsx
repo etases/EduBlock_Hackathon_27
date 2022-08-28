@@ -1,36 +1,21 @@
-import * as React from 'react'
-import { useEffect, Fragment } from 'react'
+import { Img } from '@fe/components'
 import {
   Box,
   Button,
-  Typography,
-  Stack,
-  TextField,
   Card,
-  CardMedia,
-  styled,
-  TableBody,
-  TableCell,
-  tableCellClasses,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
+  Dialog,
   FormControl,
-  FormLabel,
-  FormGroup,
   FormControlLabel,
+  FormLabel,
+  Grid,
+  MenuItem,
   Radio,
   RadioGroup,
-  Dialog,
-  Grid,
-  Menu,
-  List,
-  MenuItem,
-  ListItemText,
-  ListItem
+  Stack,
+  TextField,
+  Typography
 } from '@mui/material'
-import { Img, Table } from '@fe/components'
+import { Fragment, useEffect } from 'react'
 // @ts-ignore
 import back from './images/Back.png'
 // @ts-ignore
@@ -38,67 +23,85 @@ import edit from './images/Edit.png'
 // @ts-ignore
 import avt from './images/AVT.png'
 // import { useMediaQuery } from "react-responsive";
-import { GridColDef, GridRowsProp, DataGrid } from '@mui/x-data-grid'
-import { useNavigate } from 'react-router-dom'
-import { useStudentQuery } from '@fe/hooks/use-query'
-import { usePersistentState } from '@fe/hooks'
-import { useCanister, useConnect } from '@connect2ic/react'
 // import { backend } from '@be/backend'
 import {
-  StudentSubject,
   StudentGrade,
-  Student,
-  StudentLog
+  StudentLog,
+  StudentSubject
 } from '@be/backend/backend.did'
+// import { dao } from '@be/dao'
+import { useCanister, useConnect } from '@connect2ic/react'
 import { Principal } from '@dfinity/principal'
-import { useState } from 'react'
-import Select, { SelectChangeEvent } from '@mui/material/Select'
+import { usePersistentState } from '@fe/hooks'
 import InputLabel from '@mui/material/InputLabel'
-import { dao } from '@be/dao'
-import { backend } from '@be/backend'
+import Select from '@mui/material/Select'
+import { DataGrid, GridColDef } from '@mui/x-data-grid'
+import { format } from 'date-fns'
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
-const options = ['Chọn lớp học', '10', '11', '12']
+const rowDataTemp = [
+  { name: 'Toán' },
+  { name: 'Vật Lí' },
+  { name: 'Sinh học' },
+  { name: 'Tin học' },
+  { name: 'Ngữ Văn' },
+  { name: 'Lịch sử' },
+  { name: 'Địa lí' },
+  { name: 'Ngoại ngữ' },
+  { name: 'Giáo dục công dân' },
+  { name: 'Công nghệ' }
+  // { name: 'Thể dục' },
+  // { name: 'Giáo dục Quốc phòng - An ninh' },
+  // { name: 'Tự chọn (...)' },
+  // { name: 'DTB các môn' }
+]
 
-const colDialog: GridColDef[] = [
-  {
-    field: 'id',
-    headerName: 'Mon hoc'
-  },
+const columns: GridColDef[] = [
+  { field: 'id', headerName: 'Index' },
+  { field: 'name', headerName: 'Môn học' },
   {
     field: 'firstHalfScore',
-    headerName: 'HKI',
-    editable: true
+    headerName: 'Học kỳ 1',
+    type: 'number'
   },
   {
     field: 'secondHalfScore',
-    headerName: 'HKII',
-    editable: true
+    headerName: 'Học kỳ 2',
+    type: 'number'
+  },
+  {
+    field: 'finalScore',
+    headerName: 'Cả năm',
+    type: 'number'
   }
 ]
 
-export function SchoolReport() {
-  const rowDataTemp = [
-    { name: 'Toán' },
-    { name: 'Vật Lí' },
-    { name: 'Sinh học' },
-    { name: 'Tin học' },
-    { name: 'Ngữ Văn' },
-    { name: 'Lịch sử' },
-    { name: 'Địa lí' },
-    { name: 'Ngoại ngữ (Tiếng Anh)' },
-    { name: 'Giáo dục công dân' },
-    { name: 'Công nghệ' },
-    { name: 'Thể dục' },
-    { name: 'Giáo dục Quốc phòng - An ninh' },
-    { name: 'Tự chọn (...)' },
-    { name: 'DTB các môn' }
-  ]
+const subject = (id): StudentSubject => {
+  return {
+    finalScore: 0,
+    firstHalfScore: 0,
+    name: rowDataTemp[id].name,
+    secondHalfScore: 0
+  }
+}
 
+const grade: StudentGrade = {
+  name: new Date().getFullYear().toString(),
+  subjects: Array.from(Array(rowDataTemp.length)).map((sub, id) => subject(id))
+}
+
+export function SchoolReport() {
   const [modalOpen, setModalOpen] = useState(false)
 
   const { state: account, setState: setAccount } = usePersistentState({
     store: 'account'
   })
+
+  const { principal } = useConnect()
+
+  const [backend] = useCanister('backend')
+  const [dao] = useCanister('dao')
 
   const handleSubmit = () => {}
 
@@ -107,42 +110,27 @@ export function SchoolReport() {
   const [selectedGradeId, setSelectedGradeId] = useState(-1)
 
   const [selectedStudentGrades, setSelectedStudentGrades] = useState<
-    StudentSubject[]
-  >([])
+    StudentGrade[]
+  >([grade])
 
   const [focus, setFocus] = useState(0)
 
   const [studentLogs, setStudentLogs] = useState<StudentLog[]>(
-    Array.from(Array(10)).map((_, index) => {
-      const subject = (id) => {
-        return {
-          finalScore: index,
-          firstHalfScore: index,
-          name: rowDataTemp[id].name,
-          resitScore: index,
-          secondHalfScore: index,
-          teacherName: 'tea'
-        } as StudentSubject
-      }
-      const grade: StudentGrade = {
-        name: 'gr',
-        subjects: Array.from(Array(rowDataTemp.length)).map((sub, id) =>
-          subject(id)
-        )
-      }
-      const sl: StudentLog = {
-        newStudent: {
-          grades: [grade, grade, grade]
-        },
-        oldStudent: {
-          grades: [grade, grade, grade]
-        },
-        requester: Principal.fromText('aaaaa-aa'),
-        timestamp: BigInt(index)
-      }
+    // Array.from(Array(1)).map((_, index) => {
+    //   const sl: StudentLog = {
+    //     newStudent: {
+    //       grades: [grade]
+    //     },
+    //     oldStudent: {
+    //       grades: []
+    //     },
+    //     requester: Principal.fromText(principal),
+    //     timestamp: BigInt(getUnixTime(Date.now()))
+    //   }
 
-      return sl
-    })
+    //   return sl
+    // })
+    []
   )
 
   console.log('sample slog')
@@ -151,25 +139,6 @@ export function SchoolReport() {
   // backend
   //   .getStudentLog(Principal.fromText(account.principalId))
   //   .then(console.log)
-
-  const { principal } = useConnect()
-
-  // const [dao, { error, loading }] = useCanister('dao')
-
-  useEffect(() => {
-    // dao.createRequest({
-    //   identity: principal,
-    //   reason: 'new',
-    //   student: {
-    //     grades:
-    //   }
-    // })
-    backend.getStudentLog(Principal.fromText(principal)).then((response) => {
-      console.log('log', response)
-      return response
-    })
-  }, [])
-
   const navigate = useNavigate()
 
   const handleClick = () => {
@@ -182,101 +151,22 @@ export function SchoolReport() {
   // resitScore: 0
   // secondHalfScore: 0/
   // teacherName: "tea"
-  const columns: GridColDef[] = [
-    { field: 'id', headerName: 'Index', hide: true },
-    { field: 'name', headerName: 'Môn học', width: 400 },
-    {
-      field: 'firstHalfScore',
-      headerName: 'Học kỳ 1',
-      type: 'number',
-      width: 150
-    },
-    {
-      field: 'secondHalfScore',
-      headerName: 'Học kỳ 2',
-      type: 'number',
-      width: 150
-    },
-    {
-      field: 'finalScore',
-      headerName: 'Cả năm',
-      type: 'number',
-      width: 150
-    }
-  ]
-
-  const columnsTemp: GridColDef[] = [
-    { field: 'id', headerName: 'Index', hideable: true },
-    { field: 'name', headerName: 'Môn học' },
-    {
-      field: 'firstHalfScore',
-      headerName: 'Học kỳ 1',
-      type: 'number',
-      editable: true
-    },
-    {
-      field: 'secondHalfScore',
-      headerName: 'Học kỳ 2',
-      type: 'number',
-      editable: true
-    },
-    {
-      field: 'finalScore',
-      headerName: 'Cả năm',
-      type: 'number',
-      editable: true
-    }
-  ]
-
-  // replace Array.from(Array(10)) with data from API, use rowId from API instead of rowIndex
-  const rows: GridRowsProp = Array.from(Array(10)).map((_, rowIndex) => ({
-    id: rowIndex,
-    ...columns.reduce((prev, curr) => {
-      return {
-        ...prev,
-        [curr.field]: `${curr.headerName}__${rowIndex}`
-      }
-    }, {})
-  }))
-
-  const rowData = [
-    { name: 'Toán', HK1: 0, HK2: 0, CN: 0 },
-    { name: 'Vật Lí', HK1: 0, HK2: 0, CN: 0 },
-    { name: 'Sinh học', HK1: 0, HK2: 0, CN: 0 },
-    { name: 'Tin học', HK1: 0, HK2: 0, CN: 0 },
-    { name: 'Ngữ Văn', HK1: 0, HK2: 0, CN: 0 },
-    { name: 'Lịch sử', HK1: 0, HK2: 0, CN: 0 },
-    { name: 'Địa lí', HK1: 0, HK2: 0, CN: 0 },
-    { name: 'Ngoại ngữ (Tiếng Anh)', HK1: 0, HK2: 0, CN: 0 },
-    { name: 'Giáo dục công dân', HK1: 0, HK2: 0, CN: 0 },
-    { name: 'Công nghệ', HK1: 0, HK2: 0, CN: 0 },
-    { name: 'Thể dục', HK1: 0, HK2: 0, CN: 0 },
-    { name: 'Giáo dục Quốc phòng - An ninh', HK1: 0, HK2: 0, CN: 0 },
-    { name: 'Tự chọn (...)', HK1: 0, HK2: 0, CN: 0 },
-    { name: 'DTB các môn', HK1: 0, HK2: 0, CN: 0 }
-  ]
-
-  // const columns = [
-  //   {
-  //     field: 'name',
-  //     headerName: 'Name',
-  //     editable: true
-  //   },
-  //   {
-  //     field: 'address',
-  //     headerName: 'Address',
-  //     editable: true
-  //   }
-  // ]
-
-  //const [counter, { loading, error }] = useCanister("counter")
 
   useEffect(() => {
-    setSelectedStudentGrades(
-      studentLogs.at(selectedStudentLogId).newStudent.grades.at(selectedGradeId)
-        .subjects
-    )
-  }, [selectedGradeId, selectedStudentLogId])
+    backend
+      .getStudentLog(Principal.fromText(account.principalId))
+      .then((response) => {
+        console.log(response)
+        // setStudentLogs((response as any).data as StudentLog[])
+      })
+  }, [])
+
+  useEffect(() => {
+    if (studentLogs.length > 0)
+      setSelectedStudentGrades(
+        studentLogs.at(selectedStudentLogId)?.newStudent.grades
+      )
+  }, [selectedStudentLogId])
 
   useEffect(() => {
     console.log(selectedStudentGrades)
@@ -569,9 +459,12 @@ export function SchoolReport() {
                         setSelectedStudentLogId(Number(value))
                       }}
                     >
-                      {studentLogs.map((log, index) => (
-                        <MenuItem value={index}>{index + 1}</MenuItem>
-                      ))}
+                      {studentLogs.length > 0 &&
+                        studentLogs.map((log, index) => (
+                          <MenuItem value={index}>
+                            {format(Number(log.timestamp), 'PPPP')}
+                          </MenuItem>
+                        ))}
                     </Select>
                   </FormControl>
                 </Stack>
@@ -608,11 +501,12 @@ export function SchoolReport() {
                         setSelectedGradeId(Number(value))
                       }}
                     >
-                      {studentLogs
-                        .at(selectedStudentLogId)
-                        .newStudent.grades.map((log, index) => (
-                          <MenuItem value={index}>{index + 10}</MenuItem>
-                        ))}
+                      {studentLogs.length > 0 &&
+                        studentLogs
+                          .at(selectedStudentLogId)
+                          ?.newStudent.grades.map((log, index) => (
+                            <MenuItem value={index}>{index + 10}</MenuItem>
+                          ))}
                     </Select>
                   </FormControl>
                 </Stack>
@@ -649,13 +543,15 @@ export function SchoolReport() {
               {/* TEMP TABLE component={DataGrid}*/}
               <div style={{ height: '100%', width: '50vw' }}>
                 <DataGrid
-                  rows={studentLogs
-                    .at(selectedStudentLogId)
-                    .newStudent.grades.at(selectedGradeId)
-                    .subjects.map((gr, index) => ({
-                      id: index,
-                      ...gr
-                    }))}
+                  rows={
+                    studentLogs
+                      .at(selectedStudentLogId)
+                      ?.newStudent.grades.at(selectedGradeId)
+                      .subjects.map((gr, index) => ({
+                        id: index + 1,
+                        ...gr
+                      })) || []
+                  }
                   columns={columns}
                   // pageSize={11}
                   // rowsPerPageOptions={[11]}
@@ -665,45 +561,6 @@ export function SchoolReport() {
                   autoHeight
                 />
               </div>
-              {/* <Stack height={'100%'}>
-                <Table
-                  columns={columns}
-                  rows={studentLogs
-                    .at(selectedStudentLog)
-                    .newStudent.grades.at(selectedGrade)
-                    .subjects.map((gr, index) => ({
-                      id: index,
-                      ...gr
-                    }))}
-                  loading={false}
-                  rowCount={rows.length}
-                  hide={true}
-                  hideFooter={true}
-                  autoHeight={true}
-                  page={{
-                    page: 0,
-                    setPage(page) {
-                      // set page for query
-                    }
-                  }}
-                  pageSize={{
-                    pageSize: 15,
-                    setPageSize(size) {
-                      // set page size for query
-                    }
-                  }}
-                  sort={{
-                    onSortModelChange(gridSortModel) {
-                      // set query here
-                    }
-                  }}
-                  filter={{
-                    onFilterModelChange(gridFilterModel) {
-                      // set query here
-                    }
-                  }}
-                />
-              </Stack> */}
             </Stack>
           </Stack>
         </Stack>
@@ -753,72 +610,77 @@ export function SchoolReport() {
             >
               Cả năm
             </Grid>
-            {selectedStudentGrades.map((s, index) => (
-              <Fragment key={`${s.name}__${index}`}>
-                <Grid
-                  item={true}
-                  md={3}
-                  width={'50%'}
-                >
-                  <Typography fontSize="2vh">{s.name}</Typography>
-                </Grid>
-                <Grid
-                  item={true}
-                  md={3}
-                  width={'50%'}
-                >
-                  <TextField
-                    onFocus={() => setFocus(index)}
-                    value={s.firstHalfScore}
-                    onChange={({ target: { value } }) => {
-                      setSelectedStudentGrades((prev) => {
-                        const tmp = [...prev]
-                        tmp[focus].firstHalfScore = Number(value)
-                        console.log(tmp[focus])
-                        return tmp
-                      })
-                    }}
-                    variant={'standard'}
-                  />
-                </Grid>
-                <Grid
-                  item={true}
-                  md={3}
-                  width={'50%'}
-                >
-                  <TextField
-                    onFocus={() => setFocus(index)}
-                    value={s.secondHalfScore}
-                    onChange={({ target: { value } }) => {
-                      setSelectedStudentGrades((prev) => {
-                        const tmp = [...prev]
-                        tmp[focus].secondHalfScore = Number(value)
-                        return tmp
-                      })
-                    }}
-                    variant={'standard'}
-                  />
-                </Grid>
-                <Grid
-                  item={true}
-                  md={3}
-                  width={'50%'}
-                >
-                  <TextField
-                    onFocus={() => setFocus(index)}
-                    value={s.finalScore}
-                    onChange={({ target: { value } }) => {
-                      setSelectedStudentGrades((prev) => {
-                        const tmp = [...prev]
-                        tmp[focus].finalScore = Number(value)
-                        return tmp
-                      })
-                    }}
-                    variant={'standard'}
-                  />
-                </Grid>
-              </Fragment>
-            ))}
+            {selectedStudentGrades
+              .at(selectedGradeId)
+              .subjects.map((s, index) => (
+                <Fragment key={`${s.name}__${index}`}>
+                  <Grid
+                    item={true}
+                    md={3}
+                    width={'50%'}
+                  >
+                    <Typography fontSize="2vh">{s.name}</Typography>
+                  </Grid>
+                  <Grid
+                    item={true}
+                    md={3}
+                    width={'50%'}
+                  >
+                    <TextField
+                      onFocus={() => setFocus(index)}
+                      value={s.firstHalfScore}
+                      onChange={({ target: { value } }) => {
+                        setSelectedStudentGrades((prev) => {
+                          const tmp = [...prev]
+                          tmp[selectedGradeId].subjects[focus].firstHalfScore =
+                            Number(value)
+                          console.log(tmp[focus])
+                          return tmp
+                        })
+                      }}
+                      variant={'standard'}
+                    />
+                  </Grid>
+                  <Grid
+                    item={true}
+                    md={3}
+                    width={'50%'}
+                  >
+                    <TextField
+                      onFocus={() => setFocus(index)}
+                      value={s.secondHalfScore}
+                      onChange={({ target: { value } }) => {
+                        setSelectedStudentGrades((prev) => {
+                          const tmp = [...prev]
+                          tmp[selectedGradeId].subjects[focus].secondHalfScore =
+                            Number(value)
+                          return tmp
+                        })
+                      }}
+                      variant={'standard'}
+                    />
+                  </Grid>
+                  <Grid
+                    item={true}
+                    md={3}
+                    width={'50%'}
+                  >
+                    <TextField
+                      onFocus={() => setFocus(index)}
+                      value={s.finalScore}
+                      onChange={({ target: { value } }) => {
+                        setSelectedStudentGrades((prev) => {
+                          const tmp = [...prev]
+                          tmp[selectedGradeId].subjects[focus].finalScore =
+                            Number(value)
+                          return tmp
+                        })
+                      }}
+                      variant={'standard'}
+                    />
+                  </Grid>
+                </Fragment>
+              ))}
           </Grid>
 
           {/* <div style={{ height: '80vh', width: '50vw' }}>
@@ -832,7 +694,7 @@ export function SchoolReport() {
               // rowsPerPageOptions={[11]}
               // checkboxSelection
               onCellModesModelChange={(model, details) => {
-                
+
               }}
               disableSelectionOnClick
               hideFooter
@@ -868,6 +730,18 @@ export function SchoolReport() {
             // onClick={handleSubmit}
             onClick={() => {
               console.log(selectedStudentGrades)
+              dao
+                .createRequest({
+                  reason: 'create',
+                  identity: Principal.fromText(account.principalId),
+                  student: {
+                    grades: [grade]
+                  }
+                })
+                .then((response) => {
+                  console.log(response)
+                  return response
+                })
             }}
             sx={{
               background: '#f89c14',
