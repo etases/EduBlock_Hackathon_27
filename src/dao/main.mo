@@ -5,6 +5,9 @@ import Int "mo:base/Int";
 import Iter "mo:base/Iter";
 import Prelude "mo:base/Prelude";
 import Option "mo:base/Option";
+import Debug "mo:base/Debug";
+import Nat "mo:base/Nat";
+import Principal "mo:base/Principal";
 
 import Backend "canister:backend";
 import Token "canister:token";
@@ -218,6 +221,7 @@ actor DAO {
       if (Option.isSome(optionRequest)) {
         _removeRequest(requestId);
         let request : StudentUpdateRequest = _optionalBreak(optionRequest);
+        Debug.print("Executing request " # Nat.toText(requestId) # " for " # Principal.toText(request.identity));
         ignore Backend.updateStudent(request.identity, request.student, _optional(request.requester));
       };
     };
@@ -232,6 +236,7 @@ actor DAO {
       if (Option.isSome(optionRequest)) {
         let request : StudentUpdateRequest = _optionalBreak(optionRequest);
         if (((Time.now() - request.timestamp) / 1000000000) > maximumRequestDurationSeconds) {
+          Debug.print("Clearing request " # Nat.toText(requestId));
           _removeRequest(requestId);
         };
       };
