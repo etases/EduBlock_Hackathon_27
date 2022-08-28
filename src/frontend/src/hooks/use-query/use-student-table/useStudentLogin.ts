@@ -67,12 +67,12 @@ export function useStudentLogin(props?: UseStudentLoginProps) {
   })
 
   useEffect(() => {
-    console.log('studentLoginRole', role)
+    // console.log('studentLoginRole', role)
     if (role !== 3) setSearch('')
   }, [role])
 
   useEffect(() => {}, [search])
-  console.log('student search', search)
+  // console.log('student search', search)
 
   useEffect(() => {
     if (

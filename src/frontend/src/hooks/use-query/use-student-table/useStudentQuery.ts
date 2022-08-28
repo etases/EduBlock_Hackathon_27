@@ -122,7 +122,7 @@ export function useStudentQuery(props: UseStudentQueryProps) {
   })
 
   useEffect(() => {
-    console.log('updateSearch')
+    // console.log('updateSearch')
     setSearch(initialProps.search || '')
   }, [])
 

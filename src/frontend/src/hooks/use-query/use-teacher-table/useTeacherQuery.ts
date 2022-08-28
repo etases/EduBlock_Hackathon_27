@@ -118,7 +118,7 @@ export function useTeacherQuery(props: UseTeacherQueryProps) {
   })
 
   useEffect(() => {
-    console.log('updateSearch')
+    // console.log('updateSearch')
     setSearch(initialProps.search || '')
   }, [])
 
