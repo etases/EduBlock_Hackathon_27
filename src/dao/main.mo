@@ -100,7 +100,7 @@ actor DAO {
   };
 
   private func _removeRequest(requestId : Nat) : () {
-    switch (requests.get(requestId)) {
+    switch (requests.remove(requestId)) {
       case null return;
       case _ {
         votes := Array.filter(votes, func (v : Vote) : Bool {
