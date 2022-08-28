@@ -340,7 +340,7 @@ actor EduBlock {
    * Update the student records
    */
   public shared({caller}) func updateStudent(studentIdentity : UserIdentity, newStudent : Student, requester : ?Principal) : async Response {
-    // TODO : Check whitelist canister
+    // TODO: Check whitelist canister
     // if (not _isOwner(caller)) {
     //   return _toResponse(2);
     // };
