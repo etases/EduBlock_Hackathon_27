@@ -36,7 +36,6 @@ import { usePersistentState } from '@fe/hooks'
 import InputLabel from '@mui/material/InputLabel'
 import Select from '@mui/material/Select'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
-import { format } from 'date-fns'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
@@ -116,21 +115,7 @@ export function SchoolReport() {
   const [focus, setFocus] = useState(0)
 
   const [studentLogs, setStudentLogs] = useState<StudentLog[]>(
-    // Array.from(Array(1)).map((_, index) => {
-    //   const sl: StudentLog = {
-    //     newStudent: {
-    //       grades: [grade]
-    //     },
-    //     oldStudent: {
-    //       grades: []
-    //     },
-    //     requester: Principal.fromText(principal),
-    //     timestamp: BigInt(getUnixTime(Date.now()))
-    //   }
-
-    //   return sl
-    // })
-    []
+    [] as StudentLog[]
   )
 
   console.log('sample slog')
@@ -155,16 +140,17 @@ export function SchoolReport() {
   useEffect(() => {
     backend
       .getStudentLog(Principal.fromText(account.principalId))
-      .then((response) => {
-        console.log(response)
-        // setStudentLogs((response as any).data as StudentLog[])
+      .then((response: any) => {
+        const tmp: StudentLog[] = response.data[0]
+        console.log(tmp)
+        setStudentLogs(tmp)
       })
   }, [])
 
   useEffect(() => {
     if (studentLogs.length > 0)
       setSelectedStudentGrades(
-        studentLogs.at(selectedStudentLogId)?.newStudent.grades
+        studentLogs.at(selectedStudentLogId)?.newStudent?.grades
       )
   }, [selectedStudentLogId])
 
@@ -462,7 +448,8 @@ export function SchoolReport() {
                       {studentLogs.length > 0 &&
                         studentLogs.map((log, index) => (
                           <MenuItem value={index}>
-                            {format(Number(log.timestamp), 'PPPP')}
+                            {log.timestamp.toString()}
+                            {/* {format(Number(log.timestamp), 'PPPP')} */}
                           </MenuItem>
                         ))}
                     </Select>
@@ -490,6 +477,7 @@ export function SchoolReport() {
                   <FormControl
                     sx={{ m: 1, minWidth: 120 }}
                     size="small"
+                    disabled={true}
                   >
                     <InputLabel id="demo-select-small">Khối</InputLabel>
                     <Select
@@ -504,7 +492,7 @@ export function SchoolReport() {
                       {studentLogs.length > 0 &&
                         studentLogs
                           .at(selectedStudentLogId)
-                          ?.newStudent.grades.map((log, index) => (
+                          ?.newStudent?.grades.map((log, index) => (
                             <MenuItem value={index}>{index + 10}</MenuItem>
                           ))}
                     </Select>
@@ -546,7 +534,7 @@ export function SchoolReport() {
                   rows={
                     studentLogs
                       .at(selectedStudentLogId)
-                      ?.newStudent.grades.at(selectedGradeId)
+                      ?.newStudent?.grades.at(0)
                       .subjects.map((gr, index) => ({
                         id: index + 1,
                         ...gr
@@ -632,8 +620,7 @@ export function SchoolReport() {
                       onChange={({ target: { value } }) => {
                         setSelectedStudentGrades((prev) => {
                           const tmp = [...prev]
-                          tmp[selectedGradeId].subjects[focus].firstHalfScore =
-                            Number(value)
+                          tmp[0].subjects[focus].firstHalfScore = Number(value)
                           console.log(tmp[focus])
                           return tmp
                         })
@@ -652,8 +639,7 @@ export function SchoolReport() {
                       onChange={({ target: { value } }) => {
                         setSelectedStudentGrades((prev) => {
                           const tmp = [...prev]
-                          tmp[selectedGradeId].subjects[focus].secondHalfScore =
-                            Number(value)
+                          tmp[0].subjects[focus].secondHalfScore = Number(value)
                           return tmp
                         })
                       }}
@@ -671,8 +657,7 @@ export function SchoolReport() {
                       onChange={({ target: { value } }) => {
                         setSelectedStudentGrades((prev) => {
                           const tmp = [...prev]
-                          tmp[selectedGradeId].subjects[focus].finalScore =
-                            Number(value)
+                          tmp[0].subjects[focus].finalScore = Number(value)
                           return tmp
                         })
                       }}

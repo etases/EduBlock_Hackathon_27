@@ -29,7 +29,7 @@ const TEXT = {
 
 const ROLE = {
   1: 'admin',
-  2: 'teacher',
+  2: 'verifier',
   3: 'student'
 }
 
