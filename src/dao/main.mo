@@ -137,7 +137,7 @@ actor DAO {
   private func _addRequest(requester : UserIdentity, ticket : StudentUpdateTicket) : () {
     nextTokenId += 1;
     let request : StudentUpdateRequest = {
-      identity = requester;
+      identity = ticket.identity;
       student = ticket.student;
       requester = requester;
       timestamp = Time.now();

@@ -1,0 +1,14 @@
+{
+  "backend": {
+    "ic": "hsfbv-5iaaa-aaaag-aasua-cai"
+  },
+  "dao": {
+    "ic": "hvehb-qqaaa-aaaag-aasuq-cai"
+  },
+  "frontend": {
+    "ic": "h4hm5-gyaaa-aaaag-aasva-cai"
+  },
+  "token": {
+    "ic": "h3gkj-laaaa-aaaag-aasvq-cai"
+  }
+}
